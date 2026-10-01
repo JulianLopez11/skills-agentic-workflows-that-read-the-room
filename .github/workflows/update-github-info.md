@@ -5,9 +5,12 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+concurrency:
+  group: update-github-info
+  cancel-in-progress: true
 engine:
   id: copilot
-  model: gpt-4.1
+  model: gpt-5-mini
 tools:
   edit:
   web-fetch:
