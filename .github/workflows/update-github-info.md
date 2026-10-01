@@ -1,16 +1,18 @@
 ---
 name: update-github-info
-on:
-  schedule: daily
-  workflow_dispatch:
-permissions:
-  contents: read
-concurrency:
-  group: update-github-info
-  cancel-in-progress: true
+description: Draft website updates for Mona's GitHub Info site from official GitHub sources.
 engine:
   id: copilot
   model: gpt-4.1
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 9 * * *'
+safe-outputs:
+  create-pull-request:
+    title-prefix: "[mona] "
+    draft: true
+    fallback-as-issue: false
 tools:
   edit:
   web-fetch:
@@ -19,19 +21,23 @@ network:
     - github.blog
     - github.com
     - awesome-copilot.github.com
-safe-outputs:
-  create-pull-request:
-    max: 1
-    draft: false
 ---
 
-# Update GitHub Info
+# Update Mona's GitHub Info website
 
-Keep Mona's GitHub Info page current with concise, practical updates based on official GitHub sources.
+Read `notes/mona-notes.md` before making changes.
 
-1. Read `notes/mona-notes.md` and `site/content/github-info.md` before making changes.
-2. Use the `web_fetch` tool (a native tool call, with an underscore) to read `https://github.blog/latest/`, `https://github.blog/changelog/`, and `https://awesome-copilot.github.com/workflows/`. Do NOT run it through the shell: no curl, no wget, and no shell command named web-fetch. Shell network access is blocked. Follow links to relevant official resources with the `web_fetch` tool when useful.
-3. Select only new items that help developers learn GitHub faster. Avoid duplicating topics already covered in `site/content/github-info.md`.
-4. Update only `site/content/github-info.md`. Keep summaries short and practical, and cite each GitHub Blog, Changelog, or Awesome Copilot source with a direct link.
-5. If the page has meaningful updates, create one pull request for Mona to review. Include a concise title and explain the added updates and their sources in the pull request body. Do not push changes directly to the default branch.
-6. If a `web_fetch` call fails, retry it once with the `web_fetch` tool before giving up. Only call noop if the sources were fetched successfully and contain nothing new.
+Use these sources:
+- `notes/mona-notes.md`
+- GitHub Blog: https://github.blog/latest/
+- GitHub Changelog: https://github.blog/changelog/
+- Awesome Copilot workflows: https://awesome-copilot.github.com/workflows/
+
+Use web-fetch to read the GitHub Blog, GitHub Changelog, and Awesome Copilot workflows pages. Tell the agent to web fetch https://awesome-copilot.github.com/workflows/ and include that source in the research. Read external public guidance with web-fetch before deciding what to include.
+Read repository guidance or reference files with GitHub repository API tools instead of terminal, CLI, or sandboxed commands.
+
+Update `site/content/github-info.md` with concise, practical updates for readers and include source context when content comes from the GitHub Blog, GitHub Changelog, or Awesome Copilot.
+
+Open a pull request for Mona to review. Include the source context (GitHub Blog, GitHub Changelog, or Awesome Copilot) in the pull request description. Use a pull request title that mentions Mona or GitHub Info. Do not write directly to `main`; rely on `safe-outputs` with `create-pull-request`.
+
+Do not compile the workflow. Only create or update the markdown workflow file.
