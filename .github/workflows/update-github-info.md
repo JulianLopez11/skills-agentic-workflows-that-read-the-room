@@ -7,7 +7,7 @@ permissions:
   contents: read
 engine:
   id: copilot
-  model: gpt-4.1
+  model: haiku
 tools:
   edit:
   web-fetch:
